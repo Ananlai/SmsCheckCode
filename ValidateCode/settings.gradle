@@ -1,1 +1,1 @@
-include ':app', ':tessthello', ':'
+include ':app', ':'
