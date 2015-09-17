@@ -9,6 +9,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+/**
+ * android上获取短信信息主要有BroadcastReceiver方式与数据库方式，
+ * 要实时的话就BroadcastReceiver比较方便.
+ */
 public class MainActivity extends AppCompatActivity {
 
     public static final int MSG_RECEIVED_CODE = 1;
@@ -20,10 +24,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == MSG_RECEIVED_CODE) {
-                String code = (String)msg.obj;
+
+                String code = (String) msg.obj;
+                System.out.println("--------------------获取到验证码了--:" + code);
                 //update the UI
                 et_ValidateCode.setText(code);
             }
+
         }
     };
 
@@ -33,25 +40,31 @@ public class MainActivity extends AppCompatActivity {
         getContentResolver().unregisterContentObserver(mObserver);
     }
 
+    //该类入口
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        et_ValidateCode = (EditText)findViewById(R.id.et_validateCode);
-
+        //输入框
+        et_ValidateCode = (EditText) findViewById(R.id.et_validateCode);
+        //创建短信观察者
         mObserver = new SmsObserver(MainActivity.this, mHandler);
+
         Uri uri = Uri.parse("content://sms");
+
+        //注册：uir数据库的uri;    notifyForDescendents---boolean  true的话就会监听所有与此uri相关的uri。
+        // false的话则是直接特殊的uri才会监听。一般都设置为true.
         getContentResolver().registerContentObserver(uri, true, mObserver);
     }
 
+
+    //当用户点击menu时调用此方法。
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
+    //当用户点击一个菜单选项时，调用。
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
